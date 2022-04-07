@@ -1,8 +1,8 @@
 <template>
   <div>
     <Shape :width="50"><Triangle /></Shape>
-    <Shape color="red"><Circle /></Shape>
-    <Shape :height="10"><Square /></Shape>
+    <Shape color="red" :x="300" :y="200"><Circle /></Shape>
+    <Shape :height="10" :rotation="45"><Square /></Shape>
   </div>
 </template>
 
