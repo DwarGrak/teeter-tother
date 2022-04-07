@@ -1,25 +1,19 @@
 <template>
-  <div>
-    <Shape :width="50"><Triangle /></Shape>
-    <Shape color="red" :x="300" :y="200"><Circle /></Shape>
-    <Shape :height="10" :rotation="45"><Square /></Shape>
+  <div class="scene">
+    <Swing />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import Circle from './svg/Circle.vue';
-import Square from './svg/Square.vue';
-import Triangle from './svg/Triangle.vue';
-import Shape from './shapes/Shape.vue';
-
-export default defineComponent({
-  name: 'Scene',
-  components: {
-    Circle,
-    Square,
-    Triangle,
-    Shape,
-  },
-});
+<script setup lang="ts">
+import Swing from './Swing.vue';
 </script>
+
+<style scoped lang="scss">
+.scene {
+  position: relative;
+  margin: 20px;
+  border: 1px dashed black;
+  width: 800px;
+  height: 800px;
+}
+</style>

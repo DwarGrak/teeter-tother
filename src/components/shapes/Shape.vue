@@ -4,34 +4,43 @@
   </SWGWrapper>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed, defineProps } from 'vue';
+import { useOrigin } from '@/utils/origin';
 import SWGWrapper from './SVGWrapper.vue';
 
-export default defineComponent({
-  name: 'Shape',
-  components: {
-    SWGWrapper,
+const props = defineProps({
+  ...SWGWrapper.props,
+  originX: {
+    type: Number,
+    default: 0,
   },
-  props: {
-    width: { type: Number, default: 100 },
-    height: { type: Number, default: 100 },
-    color: { type: String, default: 'black' },
-    x: { type: Number, default: null },
-    y: { type: Number, default: null },
-    rotation: { type: Number, default: 0 },
+  originY: {
+    type: Number,
+    default: 0,
   },
-  computed: {
-    style() {
-      const position =
-        this.x !== null || this.y !== null ? 'absolute' : 'static';
-      return {
-        position,
-        left: this.x,
-        top: this.y,
-        transform: `rotate(-${this.rotation}deg)`,
-      };
-    },
-  },
+  x: { type: Number, default: null },
+  y: { type: Number, default: null },
+  rotation: { type: Number, default: 0 },
+});
+
+const top = computed(() => {
+  return props.y === null
+    ? null
+    : useOrigin(props.y, props.height, props.originY);
+});
+const left = computed(() => {
+  return props.x === null
+    ? null
+    : useOrigin(props.x, props.width, props.originX);
+});
+const style = computed(() => {
+  const position = props.x !== null || props.y !== null ? 'absolute' : 'static';
+  return {
+    position,
+    left: left.value,
+    top: top.value,
+    transform: `rotate(-${props.rotation}deg)`,
+  };
 });
 </script>

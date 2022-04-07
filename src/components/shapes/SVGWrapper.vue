@@ -9,15 +9,12 @@
   </svg>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { defineProps } from 'vue';
 
-export default defineComponent({
-  name: 'SWGWrapper',
-  props: {
-    width: { type: Number, default: 100 },
-    height: { type: Number, default: 100 },
-    color: { type: String, default: 'black' },
-  },
+defineProps({
+  width: { type: Number, default: 100 },
+  height: { type: Number, default: 100 },
+  color: { type: String, default: 'black' },
 });
 </script>
