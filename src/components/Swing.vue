@@ -1,58 +1,36 @@
 <template>
   <div>
     <Shape
-      :width="50"
-      :x="width / 2"
-      :y="500"
-      :origin-y="OriginYList.top"
-      color="red"
-    >
-      <Triangle />
-    </Shape>
-    <Shape :width="50" :x="width / 2" :y="500" :origin-y="OriginYList.bottom">
-      <Triangle />
-    </Shape>
-    <Shape
-      :width="50"
-      :x="width / 2"
-      :y="500"
-      :origin-y="OriginYList.center"
-      color="blue"
+      :height="triangleHeight"
+      :x="settings.width / 2"
+      :y="settings.height"
+      :origin-y="OriginY.bottom"
+      color="brown"
     >
       <Triangle />
     </Shape>
     <Shape
-      :width="50"
-      :x="width / 2"
-      :y="500"
-      :origin-x="OriginXList.left"
-      color="blue"
+      :height="10"
+      :width="1000"
+      :x="settings.width / 2"
+      :y="settings.height - triangleHeight"
+      :origin-y="OriginY.bottom"
     >
-      <Triangle />
+      <Square />
     </Shape>
-    <Shape
-      :width="50"
-      :x="width / 2"
-      :y="500"
-      :origin-x="OriginXList.right"
-      color="blue"
-    >
-      <Triangle />
-    </Shape>
-    <Shape color="red" :x="300" :y="200" :origin-y="OriginYList.top">
-      <Circle />
-    </Shape>
-    <Shape :height="10" :rotation="45"><Square /></Shape>
   </div>
 </template>
 
 <script setup lang="ts">
-import Circle from './svg/Circle.vue';
+import { useStore } from 'vuex';
 import Square from './svg/Square.vue';
 import Triangle from './svg/Triangle.vue';
 import Shape from './shapes/Shape.vue';
-import { OriginXList, OriginYList } from '../utils/origin';
+import { OriginY } from '../utils/origin';
 
-const width = 800;
-//const height = 800;
+const triangleHeight = 150;
+
+const {
+  state: { settings },
+} = useStore();
 </script>

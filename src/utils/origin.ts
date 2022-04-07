@@ -1,18 +1,13 @@
-export enum OriginXList {
-  'left' = -1,
-  'center' = 0,
+export enum OriginX {
+  'left' = 0,
+  'center' = 0.5,
   'right' = 1,
 }
-export enum OriginYList {
-  'top' = -1,
-  'center' = 0,
+export enum OriginY {
+  'top' = 0,
+  'center' = 0.5,
   'bottom' = 1,
 }
 
-export const useOrigin = (
-  position: number,
-  size: number,
-  originDisp: number
-) => {
-  return position + (size / 2) * originDisp;
-};
+export const useOrigin = (position: number, size: number, originDisp: number) =>
+  position - size * originDisp;

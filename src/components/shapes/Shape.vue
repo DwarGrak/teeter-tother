@@ -6,18 +6,18 @@
 
 <script setup lang="ts">
 import { computed, defineProps } from 'vue';
-import { useOrigin } from '@/utils/origin';
+import { OriginX, OriginY, useOrigin } from '@/utils/origin';
 import SWGWrapper from './SVGWrapper.vue';
 
 const props = defineProps({
   ...SWGWrapper.props,
   originX: {
     type: Number,
-    default: 0,
+    default: OriginX.center,
   },
   originY: {
     type: Number,
-    default: 0,
+    default: OriginY.center,
   },
   x: { type: Number, default: null },
   y: { type: Number, default: null },
