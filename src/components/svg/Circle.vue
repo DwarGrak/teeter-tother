@@ -1,0 +1,3 @@
+<template>
+  <circle cx="50" cy="50" r="50" />
+</template>
