@@ -1,16 +1,20 @@
 <template>
   <div class="scene" :style="style">
-    <Swing />
+    <Swing :rotation="props.swingRotation" />
     <Mass :mass="5" :y="100" :x="100"><Triangle /></Mass>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { defineProps, computed } from 'vue';
 import { useStore } from 'vuex';
 import Swing from './Swing.vue';
 import Mass from './shapes/Mass.vue';
 import Triangle from './svg/Triangle.vue';
+
+const props = defineProps({
+  swingRotation: { type: Number, default: 0 },
+});
 
 const {
   state: { settings },

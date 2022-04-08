@@ -15,7 +15,7 @@
       :x="settings.width / 2"
       :y="settings.height - triangleHeight"
       :origin-y="OriginY.bottom"
-      :rotation="30"
+      :rotation="props.rotation"
     >
       <Square />
     </Shape>
@@ -23,13 +23,17 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from 'vuex';
+import { defineProps, useStore } from 'vuex';
 import Square from './svg/Square.vue';
 import Triangle from './svg/Triangle.vue';
 import Shape from './shapes/Shape.vue';
 import { OriginY } from '../utils/origin';
 
 const triangleHeight = 250;
+
+const props = defineProps({
+  rotation: { type: Number, default: 0 },
+});
 
 const {
   state: { settings },

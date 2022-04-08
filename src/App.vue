@@ -1,7 +1,7 @@
 <template>
-  <Scene />
+  <Game />
 </template>
 
 <script setup lang="ts">
-import Scene from './components/Scene.vue';
+import Game from './components/Game.vue';
 </script>
