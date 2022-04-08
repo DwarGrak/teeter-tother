@@ -1,6 +1,7 @@
 <template>
   <div class="scene" :style="style">
     <Swing />
+    <Mass :mass="5" :y="100" :x="100"><Triangle /></Mass>
   </div>
 </template>
 
@@ -8,6 +9,8 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import Swing from './Swing.vue';
+import Mass from './shapes/Mass.vue';
+import Triangle from './svg/Triangle.vue';
 
 const {
   state: { settings },
