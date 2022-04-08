@@ -41,6 +41,7 @@ const style = computed(() => {
     left: left.value,
     top: top.value,
     transform: `rotate(-${props.rotation}deg)`,
+    'transform-origin': `${OriginX[props.originX]} ${OriginY[props.originY]}`,
   };
 });
 </script>

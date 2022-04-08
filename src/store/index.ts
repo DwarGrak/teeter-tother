@@ -1,10 +1,10 @@
 import { createStore } from 'vuex';
-import settings from './modules/settings';
+import { settings, SettingsState } from './modules/settings';
 
-export default createStore({
-  state: {},
-  getters: {},
-  mutations: {},
-  actions: {},
+export interface State {
+  settings: SettingsState;
+}
+
+export default createStore<State>({
   modules: { settings },
 });
