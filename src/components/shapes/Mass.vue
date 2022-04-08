@@ -1,5 +1,5 @@
 <template>
-  <Shape v-bind="shapeProps">
+  <Shape v-bind="props">
     <slot />
     <text
       :x="props.width * 0.5"

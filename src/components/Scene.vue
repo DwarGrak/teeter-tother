@@ -1,7 +1,12 @@
 <template>
   <div class="scene" :style="style">
     <Swing :rotation="props.swingRotation" />
-    <Mass :mass="5" :y="100" :x="100"><Triangle /></Mass>
+    <ShapeFabric
+      v-for="mass in attachedMasses"
+      :key="mass.id"
+      :wrapper="Mass"
+      v-bind="mass"
+    />
   </div>
 </template>
 
@@ -10,10 +15,12 @@ import { defineProps, computed } from 'vue';
 import { useStore } from 'vuex';
 import Swing from './Swing.vue';
 import Mass from './shapes/Mass.vue';
-import Triangle from './svg/Triangle.vue';
+import ShapeFabric from './shapes/ShapeFabric.vue';
+import AttachedMass from '@/interfaces/AttachedMass';
 
 const props = defineProps({
   swingRotation: { type: Number, default: 0 },
+  attachedMasses: { type: Array as AttachedMass[], default: () => [] },
 });
 
 const {
