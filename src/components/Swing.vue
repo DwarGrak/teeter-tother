@@ -15,6 +15,7 @@
       :x="settings.width / 2"
       :y="settings.height - triangleHeight"
       :origin-y="OriginY.bottom"
+      :rotation="30"
     >
       <Square />
     </Shape>
@@ -28,7 +29,7 @@ import Triangle from './svg/Triangle.vue';
 import Shape from './shapes/Shape.vue';
 import { OriginY } from '../utils/origin';
 
-const triangleHeight = 150;
+const triangleHeight = 250;
 
 const {
   state: { settings },

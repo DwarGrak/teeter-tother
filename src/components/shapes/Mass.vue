@@ -6,8 +6,9 @@
       :y="props.height * 0.7"
       fill="white"
       text-anchor="middle"
-      >{{ props.mass }}kg</text
     >
+      {{ props.mass }}kg
+    </text>
   </Shape>
 </template>
 
