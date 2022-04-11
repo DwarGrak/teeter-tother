@@ -1,28 +1,30 @@
+import MovableMass from '@/interfaces/MovableMass';
 import Position from '@/interfaces/Position';
 import store from '@/store';
-import { degToRad } from './angle';
+import { calcAngleByDisps } from './angle';
 
 export const calcMassCoordinatesOnSwing = (
   position: number,
-  angleDeg: number
+  angle: number
 ): Position => {
   const { sceneWidth, sceneHeight, standHeight, leverWidth } =
     store.state.settings;
 
-  const angleRad = degToRad(angleDeg);
-
   return {
     x:
       sceneWidth / 2 +
-      Math.cos(angleRad) * position -
-      Math.sin(angleRad) * leverWidth,
+      Math.cos(angle) * position -
+      Math.sin(angle) * leverWidth,
     y:
       sceneHeight -
       standHeight -
-      Math.cos(angleRad) * leverWidth -
-      Math.sin(angleRad) * position,
+      Math.cos(angle) * leverWidth -
+      Math.sin(angle) * position,
   };
 };
+
+export const distByDisp = (dx: number, dy: number) =>
+  Math.sqrt(dx * dx + dy * dy);
 
 export const calcDisplacement = (pos: number, speed: number, delay: number) =>
   pos + (delay / 1000) * speed;
@@ -37,3 +39,16 @@ export const applyRestrictions = (
   min: number,
   max: number
 ): number => Math.max(Math.min(value, max), min);
+
+export const calcPositionOnSwing = (
+  mass: MovableMass,
+  angle: number
+): number | undefined => {
+  const swingCenter = calcMassCoordinatesOnSwing(0, angle);
+  const dx = mass.x.pos - swingCenter.x;
+  const dy = mass.y.pos - swingCenter.y;
+  const massAngle = calcAngleByDisps(dx, dy);
+  if (massAngle < -angle) {
+    return -distByDisp(dx, dy);
+  }
+};
