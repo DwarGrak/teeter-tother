@@ -42,7 +42,6 @@ export const moveMass = (
 };
 
 export const stopMass = (mass: MovableMass): void => {
-  console.log('stop');
   mass.x = { ...mass.x, v: 0, a: 0 };
   mass.y = { ...mass.y, v: 0, a: 0 };
 };

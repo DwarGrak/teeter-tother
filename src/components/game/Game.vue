@@ -13,10 +13,10 @@ import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { GlobalEvents } from 'vue-global-events';
 import GameMass from '@/interfaces/GameMass';
-import { calcPositionOnSwing, calcMassCoordinatesOnSwing } from '@/utils/calc';
 import Scene from '../Scene.vue';
 import useClenchedMove from './useClenchedMove';
 import { moveMass } from '@/services/MovableService';
+import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
 import { degToRad } from '@/utils/angle';
 
@@ -55,7 +55,7 @@ const positionedMasses = computed<PositionedMass[]>(() =>
   masses.value.map(({ status, ...mass }) => {
     const position =
       status === 'on-swing'
-        ? calcMassCoordinatesOnSwing(mass.x.pos, swingAngleRad)
+        ? swingToPos(mass.x.pos, swingAngleRad)
         : { x: mass.x.pos, y: mass.y.pos };
     const rotation = status === 'on-swing' ? swingRotation : 0;
     return {
@@ -97,9 +97,9 @@ const tick = () => {
       moveMass(clenchedMass.value, delay, { min: minX, max: centerX });
     } else if (mass.status === 'falling') {
       moveMass(mass, delay, undefined, { min: 0, max: sceneHeight });
-      const pos = calcPositionOnSwing(mass, swingAngleRad);
-      if (pos !== undefined) {
-        mass.x = { pos, v: 0, a: 0 };
+      const dist = posToSwing(mass, swingAngleRad);
+      if (dist !== undefined) {
+        mass.x = { pos: dist, v: 0, a: 0 };
         mass.y = { pos: 0, v: 0, a: 0 };
         mass.status = 'on-swing';
       }
