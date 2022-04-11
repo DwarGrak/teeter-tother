@@ -1,11 +1,11 @@
-import Coordinates from '@/interfaces/Position';
+import Position from '@/interfaces/Position';
 import store from '@/store';
 import { degToRad } from './angle';
 
 export const calcMassCoordinatesOnSwing = (
   position: number,
   angleDeg: number
-): Coordinates => {
+): Position => {
   const { sceneWidth, sceneHeight, standHeight, leverWidth } =
     store.state.settings;
 
@@ -23,3 +23,17 @@ export const calcMassCoordinatesOnSwing = (
       Math.sin(angleRad) * position,
   };
 };
+
+export const calcDisplacement = (pos: number, speed: number, delay: number) =>
+  pos + (delay / 1000) * speed;
+
+export interface Restrictions {
+  min: number;
+  max: number;
+}
+
+export const applyRestrictions = (
+  value: number,
+  min: number,
+  max: number
+): number => Math.max(Math.min(value, max), min);

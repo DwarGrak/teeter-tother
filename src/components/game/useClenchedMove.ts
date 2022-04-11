@@ -1,45 +1,22 @@
-import MassX from '@/interfaces/MassX';
-import { ref } from 'vue';
+import { Ref } from 'vue';
+import MovableMass from '@/interfaces/MovableMass';
+import { stopMass } from '@/services/MovableService';
 
 export default function useClenchedMove(
-  mass: MassX | undefined,
-  minX: number,
-  maxX: number,
+  massRef: Ref<MovableMass>,
   speedMult: number
 ) {
-  const moveStart = ref<number>(0);
-  const direction = ref<number>(0);
-
-  const calcSpeed = () => {
-    const moveTime = Date.now() - moveStart.value;
-    return (moveTime / 1000) * speedMult * direction.value;
-  };
-
-  const move = () => {
-    if (!direction.value) return;
-    if (!mass) throw new Error('Mass is not found');
-    const nextX = mass.x + calcSpeed();
-    mass.x = Math.max(Math.min(nextX, maxX), minX);
-    if (mass.x === minX || mass.x === maxX) {
-      stopMove();
-    }
-  };
-
-  const startMove = (newDirection: number) => {
+  const startMove = (direction: number) => {
+    const mass = massRef.value;
     if (!mass) return;
-    if (newDirection === direction.value) return;
-    stopMove();
-    moveStart.value = Date.now();
-    direction.value = newDirection;
-  };
-
-  const stopMove = () => {
-    moveStart.value = 0;
-    direction.value = 0;
+    if (mass.x.v && direction > 0 === mass.x.v > 0) return;
+    mass.x.v = 0;
+    mass.x.a = direction * speedMult;
   };
 
   const startMoveLeft = () => startMove(-1);
   const startMoveRight = () => startMove(1);
+  const stopMove = () => massRef.value && stopMass(massRef.value);
 
-  return { move, startMoveLeft, startMoveRight, stopMove };
+  return { startMoveLeft, startMoveRight, stopMove };
 }

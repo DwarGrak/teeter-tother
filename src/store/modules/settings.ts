@@ -15,6 +15,6 @@ export const settings = {
     standHeight: 250,
     leverLength: 1000,
     leverWidth: 10,
-    speedMult: 30,
+    speedMult: 300,
   }),
 };
