@@ -14,3 +14,5 @@ export const applyRestrictions = (
   min: number,
   max: number
 ): number => Math.max(Math.min(value, max), min);
+
+export const calcMoment = (mass: number, dist: number) => mass * dist;

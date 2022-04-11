@@ -3,9 +3,12 @@
     @keydown.left="startMoveLeft"
     @keydown.right="startMoveRight"
     @keydown.enter="dropMass"
+    @keydown.space="pause"
     @keyup="stopMove"
   />
-  <Scene :swingRotation="swingRotation" :masses="positionedMasses" />
+  <div>{{ isPaused }}</div>
+  <div>{{ swingAngle }}</div>
+  <Scene :swingRotation="swingAngle" :masses="positionedMasses" />
 </template>
 
 <script setup lang="ts">
@@ -19,7 +22,7 @@ import useDraw from './useDraw';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
-import { degToRad } from '@/utils/angle';
+import { calcDisplacement } from '@/utils/calc';
 
 const {
   state: {
@@ -27,8 +30,9 @@ const {
   },
 } = useStore();
 
-const swingRotation = 15;
-const swingAngleRad = degToRad(swingRotation);
+const swingAngle = ref(0);
+const swingSpeed = ref(0);
+const swingMoment = ref(0);
 
 const masses = ref<GameMass[]>([
   {
@@ -37,7 +41,7 @@ const masses = ref<GameMass[]>([
     size: 70,
     type: 'triangle',
     color: 'red',
-    x: { pos: -100, v: 0, a: 0 },
+    x: { pos: 100, v: 0, a: 0 },
     y: { pos: 0, v: 0, a: 0 },
     status: 'on-swing',
   },
@@ -56,9 +60,9 @@ const positionedMasses = computed<PositionedMass[]>(() =>
   masses.value.map(({ status, ...mass }) => {
     const position =
       status === 'on-swing'
-        ? swingToPos(mass.x.pos, swingAngleRad)
+        ? swingToPos(mass.x.pos, swingAngle.value)
         : { x: mass.x.pos, y: mass.y.pos };
-    const rotation = status === 'on-swing' ? swingRotation : 0;
+    const rotation = status === 'on-swing' ? swingAngle.value : 0;
     return {
       ...mass,
       width: mass.size,
@@ -88,19 +92,46 @@ const dropMass = () => {
   clenchedMass.value.status = 'falling';
 };
 
-useDraw((delay: number) => {
+const isPaused = ref(true);
+
+const addMoment = (moment: number) => {
+  swingMoment.value -= moment / 1000;
+};
+addMoment(100 * 10);
+
+const { start: startDraw } = useDraw((delay: number) => {
+  if (isPaused.value) return false;
+
+  swingSpeed.value = calcDisplacement(
+    swingSpeed.value,
+    swingMoment.value,
+    delay
+  );
+  swingAngle.value = calcDisplacement(
+    swingAngle.value,
+    swingSpeed.value,
+    delay
+  );
+
   for (let mass of masses.value) {
     if (mass.status === 'clenched') {
       moveMass(clenchedMass.value, delay, { min: minX, max: centerX });
     } else if (mass.status === 'falling') {
       moveMass(mass, delay, undefined, { min: 0, max: sceneHeight });
-      const dist = posToSwing(mass, swingAngleRad);
+      const dist = posToSwing(mass, swingAngle.value);
       if (dist !== undefined) {
         mass.x = { pos: dist, v: 0, a: 0 };
         mass.y = { pos: 0, v: 0, a: 0 };
         mass.status = 'on-swing';
+        addMoment(dist * mass.mass);
       }
     }
   }
+  return true;
 });
+
+const pause = () => {
+  isPaused.value = !isPaused.value;
+  startDraw();
+};
 </script>

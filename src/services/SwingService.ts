@@ -29,7 +29,6 @@ export const posToSwing = (
   const dx = mass.x.pos - swingCenter.x;
   const dy = mass.y.pos - swingCenter.y;
   const massAngle = calcAngleByDisps(dx, dy);
-  if (massAngle < -angle) {
-    return -distByDisp(dx, dy);
-  }
+  if (massAngle > -angle) return;
+  return -distByDisp(dx, dy);
 };
