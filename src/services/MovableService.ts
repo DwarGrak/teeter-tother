@@ -36,7 +36,6 @@ export const moveMass = (
   const stopX = moveMassByCoordinate(mass.x, delay, restX);
   const stopY = moveMassByCoordinate(mass.y, delay, restY);
   if (stopX || stopY) {
-    console.log(mass, stopX, stopY);
     stopMass(mass);
   }
 };

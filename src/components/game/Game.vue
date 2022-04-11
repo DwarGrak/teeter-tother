@@ -15,6 +15,7 @@ import { GlobalEvents } from 'vue-global-events';
 import GameMass from '@/interfaces/GameMass';
 import Scene from '../Scene.vue';
 import useClenchedMove from './useClenchedMove';
+import useDraw from './useDraw';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
@@ -87,11 +88,7 @@ const dropMass = () => {
   clenchedMass.value.status = 'falling';
 };
 
-const tickTime = ref(Date.now());
-
-const tick = () => {
-  const now = Date.now();
-  const delay = now - tickTime.value;
+useDraw((delay: number) => {
   for (let mass of masses.value) {
     if (mass.status === 'clenched') {
       moveMass(clenchedMass.value, delay, { min: minX, max: centerX });
@@ -105,9 +102,5 @@ const tick = () => {
       }
     }
   }
-  tickTime.value = now;
-  requestAnimationFrame(tick);
-};
-
-requestAnimationFrame(tick);
+});
 </script>
