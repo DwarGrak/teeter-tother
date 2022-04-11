@@ -21,7 +21,7 @@ import useClenchedMove from './useClenchedMove';
 
 const {
   state: {
-    settings: { sceneWidth, leverLength },
+    settings: { sceneWidth, leverLength, speedMult },
   },
 } = useStore();
 
@@ -43,9 +43,17 @@ const clenchedMass = reactive<MassX>({
 const minX = (sceneWidth - leverLength) / 2;
 const centerX = sceneWidth / 2;
 
-const { startMoveLeft, startMoveRight, stopMove } = useClenchedMove(
-  clenchedMass,
-  minX,
-  centerX
-);
+const {
+  move: clenchedMove,
+  startMoveLeft,
+  startMoveRight,
+  stopMove,
+} = useClenchedMove(clenchedMass, minX, centerX, speedMult);
+
+const tick = () => {
+  clenchedMove();
+  requestAnimationFrame(tick);
+};
+
+requestAnimationFrame(tick);
 </script>

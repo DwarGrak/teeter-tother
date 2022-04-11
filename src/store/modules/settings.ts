@@ -4,6 +4,7 @@ export interface SettingsState {
   standHeight: number;
   leverLength: number;
   leverWidth: number;
+  speedMult: number;
 }
 
 export const settings = {
@@ -14,5 +15,6 @@ export const settings = {
     standHeight: 250,
     leverLength: 1000,
     leverWidth: 10,
+    speedMult: 30,
   }),
 };
