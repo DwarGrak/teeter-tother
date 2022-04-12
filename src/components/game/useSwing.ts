@@ -7,6 +7,12 @@ export default function useSwing(momentAcceleration: number) {
   const swingSpeed = ref(0);
   const swingMoment = ref(0);
 
+  const initSwing = () => {
+      swingAngle.value = 0;
+      swingSpeed.value = 0;
+      swingMoment.value = 0;
+  }
+
   const addMoment = (moment: number) => {
     swingMoment.value -= moment * momentAcceleration;
   };
@@ -29,5 +35,5 @@ export default function useSwing(momentAcceleration: number) {
     );
   };
 
-  return { swingAngle, addMassToSwing, rotateSwing };
+  return { swingAngle, initSwing, addMassToSwing, rotateSwing };
 }

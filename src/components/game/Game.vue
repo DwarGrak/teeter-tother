@@ -29,7 +29,7 @@ import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
 import { getRandomInt, getRandomItem } from '@/utils/calc';
-import { svgMap } from '../svg';
+import { svgMap, svgName } from '../svg';
 import { radToDeg } from '@/utils/angle';
 
 const {
@@ -46,7 +46,7 @@ const {
   },
 } = useStore();
 
-const { swingAngle, addMassToSwing, rotateSwing } =
+const { swingAngle, initSwing, addMassToSwing, rotateSwing } =
   useSwing(momentAcceleration);
 
 const masses = ref<GameMass[]>([]);
@@ -124,12 +124,12 @@ const { start: startDraw } = useDraw((delay: number) => {
   return true;
 });
 
-const createRandomMass = (status: GameMassStatus) => {
+const createRandomMass = (status: GameMassStatus): GameMass => {
   const colors = ['red', 'green', 'yellow', 'orange'];
   const color = getRandomItem(colors);
   const mass = 1 + getRandomInt(10);
   const size = 60 + getRandomInt(40);
-  const type = getRandomItem(Object.keys(svgMap));
+  const type = getRandomItem(Object.keys(svgMap)) as svgName;
   const x =
     status === 'clenched'
       ? minX + getRandomInt(centerX - minX)
@@ -153,13 +153,15 @@ const finishGame = () => {
 };
 
 const startGame = () => {
+  timer.value = Date.now();
+  initSwing();
+  isStarted.value = true;
+  isPaused.value = false;
+
   const swingedMass = createRandomMass('on-swing');
   const clenchedMass = createRandomMass('clenched');
   masses.value = [swingedMass, clenchedMass];
   addMassToSwing(swingedMass);
-  timer.value = Date.now();
-  isStarted.value = true;
-  isPaused.value = false;
 };
 
 const switchState = () => {
