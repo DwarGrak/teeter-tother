@@ -107,7 +107,10 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
 
   for (let mass of masses.value) {
     if (mass.status === 'clenched') {
-      moveMass(clenchedMass.value, delay, { min: minX, max: centerX });
+      moveMass(clenchedMass.value, delay, {
+        min: minX,
+        max: minX + leverLength,
+      });
     } else if (mass.status === 'falling') {
       moveMass(mass, delay, undefined, { min: 0, max: sceneHeight });
       const dist = posToSwing(mass, swingAngle.value);
