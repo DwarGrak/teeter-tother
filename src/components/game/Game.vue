@@ -22,12 +22,12 @@ import GameMass, { GameMassStatus } from '@/interfaces/GameMass';
 import Scene from '../Scene.vue';
 import useClenchedMove from './useClenchedMove';
 import useDraw from './useDraw';
+import useSwing from './useSwing';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
-import { calcDisplacement, getRandomInt, getRandomItem } from '@/utils/calc';
+import { getRandomInt, getRandomItem } from '@/utils/calc';
 import { svgMap } from '../svg';
-import MovableMass from '@/interfaces/MovableMass';
 
 const {
   state: {
@@ -35,9 +35,7 @@ const {
   },
 } = useStore();
 
-const swingAngle = ref(0);
-const swingSpeed = ref(0);
-const swingMoment = ref(0);
+const { swingAngle, addMassToSwing, rotateSwing } = useSwing();
 
 const masses = ref<GameMass[]>([]);
 
@@ -80,27 +78,10 @@ const dropMass = () => {
 const isStarted = ref(false);
 const isPaused = ref(true);
 
-const addMoment = (moment: number) => {
-  swingMoment.value -= moment / 5000;
-};
-const addMassToSwing = (mass: MovableMass) => {
-  const moment = mass.x.pos * mass.mass;
-  addMoment(moment);
-};
-
 const { start: startDraw } = useDraw((delay: number) => {
   if (isPaused.value) return false;
 
-  swingSpeed.value = calcDisplacement(
-    swingSpeed.value,
-    swingMoment.value,
-    delay
-  );
-  swingAngle.value = calcDisplacement(
-    swingAngle.value,
-    swingSpeed.value,
-    delay
-  );
+  rotateSwing(delay);
 
   for (let mass of masses.value) {
     if (mass.status === 'clenched') {
