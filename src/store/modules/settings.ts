@@ -8,6 +8,7 @@ export interface SettingsState {
   maxAngle: number;
   gravityAcceleration: number;
   momentAcceleration: number;
+  dropDelay: number;
 }
 
 export const settings = {
@@ -22,5 +23,6 @@ export const settings = {
     maxAngle: 30,
     gravityAcceleration: 1000,
     momentAcceleration: 5e-5,
+    dropDelay: 1000,
   }),
 };

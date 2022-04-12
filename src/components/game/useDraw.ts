@@ -1,12 +1,12 @@
 import { ref } from 'vue';
 
-export default function useDraw(draw: (delay: number) => boolean) {
+export default function useDraw(draw: (now: number, delay: number) => boolean) {
   const tickTime = ref(0);
 
   const tick = () => {
     const now = Date.now();
     const delay = now - tickTime.value;
-    if (!draw(delay)) return;
+    if (!draw(now, delay)) return;
     tickTime.value = now;
     requestAnimationFrame(tick);
   };

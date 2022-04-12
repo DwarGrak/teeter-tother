@@ -42,6 +42,7 @@ const {
       maxAngle,
       momentAcceleration,
       gravityAcceleration,
+      dropDelay,
     },
   },
 } = useStore();
@@ -50,6 +51,12 @@ const { swingAngle, initSwing, addMassToSwing, rotateSwing } =
   useSwing(momentAcceleration);
 
 const masses = ref<GameMass[]>([]);
+
+const isStarted = ref(false);
+const isPaused = ref(true);
+const timer = ref(0);
+const score = ref(0);
+const dropTimer = ref(0);
 
 const positionedMasses = computed<PositionedMass[]>(() =>
   masses.value.map(({ status, ...mass }) => {
@@ -89,14 +96,10 @@ const dropMass = () => {
     a: gravityAcceleration,
   };
   clenchedMass.value.status = 'falling';
+  dropTimer.value = Date.now() + dropDelay;
 };
 
-const isStarted = ref(false);
-const isPaused = ref(true);
-const timer = ref(0);
-const score = ref(0);
-
-const { start: startDraw } = useDraw((delay: number) => {
+const { start: startDraw } = useDraw((now: number, delay: number) => {
   if (isPaused.value) return false;
 
   score.value = Date.now() - timer.value;
@@ -117,10 +120,16 @@ const { start: startDraw } = useDraw((delay: number) => {
     }
   }
 
+  if (dropTimer.value && dropTimer.value < now) {
+    dropTimer.value = 0;
+    addNewClenchedMass();
+  }
+
   if (Math.abs(radToDeg(swingAngle.value)) > maxAngle) {
     finishGame();
     return false;
   }
+
   return true;
 });
 
@@ -147,9 +156,17 @@ const createRandomMass = (status: GameMassStatus): GameMass => {
   };
 };
 
+const addNewClenchedMass = () => {
+  masses.value.push(createRandomMass('clenched'));
+};
+
 const finishGame = () => {
   isStarted.value = false;
   isPaused.value = true;
+  if (dropTimer.value) {
+    clearTimeout(dropTimer.value);
+    dropTimer.value = 0;
+  }
 };
 
 const startGame = () => {
