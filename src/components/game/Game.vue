@@ -43,6 +43,7 @@ const {
       momentAcceleration,
       gravityAcceleration,
       dropDelay,
+      gameOverMass,
     },
   },
 } = useStore();
@@ -99,12 +100,29 @@ const dropMass = () => {
   dropTimer.value = Date.now() + dropDelay;
 };
 
+const checkMaxAngle = (): boolean =>
+  Math.abs(radToDeg(swingAngle.value)) > maxAngle;
+
+const checkMaxMass = (): boolean => {
+  let leftMass = 0;
+  let rightMass = 0;
+
+  for (let mass of masses.value) {
+    if (mass.status !== 'on-swing') continue;
+    if (mass.x.pos < 0) leftMass += mass.mass;
+    else rightMass += mass.mass;
+  }
+
+  return leftMass >= gameOverMass || rightMass >= gameOverMass;
+};
+
 const { start: startDraw } = useDraw((now: number, delay: number) => {
   if (isPaused.value) return false;
 
   score.value = Date.now() - timer.value;
   rotateSwing(delay);
 
+  let massAddedToSwing = false;
   for (let mass of masses.value) {
     if (mass.status === 'clenched') {
       moveMass(clenchedMass.value, delay, {
@@ -119,18 +137,19 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
         mass.y = { pos: 0, v: 0, a: 0 };
         mass.status = 'on-swing';
         addMassToSwing(mass);
+        massAddedToSwing = true;
       }
     }
+  }
+
+  if (checkMaxAngle() || (massAddedToSwing && checkMaxMass())) {
+    finishGame();
+    return false;
   }
 
   if (dropTimer.value && dropTimer.value < now) {
     dropTimer.value = 0;
     addNewClenchedMass();
-  }
-
-  if (Math.abs(radToDeg(swingAngle.value)) > maxAngle) {
-    finishGame();
-    return false;
   }
 
   return true;

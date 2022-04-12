@@ -9,6 +9,7 @@ export interface SettingsState {
   gravityAcceleration: number;
   momentAcceleration: number;
   dropDelay: number;
+  gameOverMass: number;
 }
 
 export const settings = {
@@ -24,5 +25,6 @@ export const settings = {
     gravityAcceleration: 1000,
     momentAcceleration: 5e-5,
     dropDelay: 1000,
+    gameOverMass: 20,
   }),
 };
