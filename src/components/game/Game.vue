@@ -166,10 +166,7 @@ const addNewClenchedMass = () => {
 const finishGame = () => {
   isStarted.value = false;
   isPaused.value = true;
-  if (dropTimer.value) {
-    clearTimeout(dropTimer.value);
-    dropTimer.value = 0;
-  }
+  dropTimer.value = 0;
 };
 
 const startGame = () => {
