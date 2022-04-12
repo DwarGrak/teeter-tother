@@ -7,6 +7,12 @@
       :wrapper="Mass"
       v-bind="mass"
     />
+    <div v-if="!props.started" class="scene__banner">
+      Press space to start...
+    </div>
+    <div v-else-if="props.paused" class="scene__banner">
+      Press space to continue...
+    </div>
   </div>
 </template>
 
@@ -21,6 +27,8 @@ import PositionedMass from '@/interfaces/PositionedMass';
 const props = defineProps({
   swingRotation: { type: Number, default: 0 },
   masses: { type: Array as PositionedMass[], default: () => [] },
+  started: { type: Boolean, default: false },
+  paused: { type: Boolean, default: false },
 });
 
 const {
@@ -41,5 +49,16 @@ const style = computed(() => ({
   margin: 20px;
   border: 1px dashed black;
   overflow: hidden;
+  
+  &__banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+    font-size: 48px;
+    padding-top: 200px;
+  }
 }
 </style>

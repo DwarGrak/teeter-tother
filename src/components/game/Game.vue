@@ -3,26 +3,30 @@
     @keydown.left="startMoveLeft"
     @keydown.right="startMoveRight"
     @keydown.enter="dropMass"
-    @keydown.space="pause"
+    @keydown.space="switchState"
     @keyup="stopMove"
   />
-  <div>{{ isPaused }}</div>
-  <div>{{ swingAngle }}</div>
-  <Scene :swingRotation="swingAngle" :masses="positionedMasses" />
+  <Scene
+    :swingRotation="swingAngle"
+    :masses="positionedMasses"
+    :started="isStarted"
+    :paused="isPaused"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { GlobalEvents } from 'vue-global-events';
-import GameMass from '@/interfaces/GameMass';
+import GameMass, { GameMassStatus } from '@/interfaces/GameMass';
 import Scene from '../Scene.vue';
 import useClenchedMove from './useClenchedMove';
 import useDraw from './useDraw';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
-import { calcDisplacement } from '@/utils/calc';
+import { calcDisplacement, getRandomInt, getRandomItem } from '@/utils/calc';
+import { svgMap } from '../svg';
 
 const {
   state: {
@@ -34,27 +38,7 @@ const swingAngle = ref(0);
 const swingSpeed = ref(0);
 const swingMoment = ref(0);
 
-const masses = ref<GameMass[]>([
-  {
-    id: 1,
-    mass: 10,
-    size: 70,
-    type: 'triangle',
-    color: 'red',
-    x: { pos: 100, v: 0, a: 0 },
-    y: { pos: 0, v: 0, a: 0 },
-    status: 'on-swing',
-  },
-  {
-    mass: 10,
-    size: 70,
-    type: 'triangle',
-    color: 'green',
-    x: { pos: 300, v: 0, a: 0 },
-    y: { pos: 100, v: 0, a: 0 },
-    status: 'clenched',
-  },
-]);
+const masses = ref<GameMass[]>([]);
 
 const positionedMasses = computed<PositionedMass[]>(() =>
   masses.value.map(({ status, ...mass }) => {
@@ -92,10 +76,11 @@ const dropMass = () => {
   clenchedMass.value.status = 'falling';
 };
 
+const isStarted = ref(false);
 const isPaused = ref(true);
 
 const addMoment = (moment: number) => {
-  swingMoment.value -= moment / 1000;
+  swingMoment.value -= moment / 5000;
 };
 addMoment(100 * 10);
 
@@ -130,8 +115,38 @@ const { start: startDraw } = useDraw((delay: number) => {
   return true;
 });
 
-const pause = () => {
-  isPaused.value = !isPaused.value;
-  startDraw();
+const createRandomMass = (status: GameMassStatus) => {
+  const colors = ['red', 'green', 'yellow', 'orange'];
+  const color = getRandomItem(colors);
+  const mass = 1 + getRandomInt(10);
+  const size = 60 + getRandomInt(40);
+  const type = getRandomItem(Object.keys(svgMap));
+  const x =
+    status === 'clenched'
+      ? minX + getRandomInt(centerX - minX)
+      : 100 + getRandomInt(leverLength / 2 - 200);
+  const y = status === 'clenched' ? size : 0;
+
+  return {
+    mass,
+    size,
+    type,
+    color,
+    x: { pos: x, v: 0, a: 0 },
+    y: { pos: y, v: 0, a: 0 },
+    status,
+  };
+};
+
+const startGame = () => {
+  masses.value = [createRandomMass('on-swing'), createRandomMass('clenched')];
+  isStarted.value = true;
+  isPaused.value = false;
+};
+
+const switchState = () => {
+  if (!isStarted.value) startGame();
+  else isPaused.value = !isPaused.value;
+  if (!isPaused.value) startDraw();
 };
 </script>

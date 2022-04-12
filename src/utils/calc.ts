@@ -16,3 +16,8 @@ export const applyRestrictions = (
 ): number => Math.max(Math.min(value, max), min);
 
 export const calcMoment = (mass: number, dist: number) => mass * dist;
+
+export const getRandomInt = (max: number) => Math.floor(Math.random() * max);
+
+export const getRandomItem = (array: any[]) =>
+  array[getRandomInt(array.length)];

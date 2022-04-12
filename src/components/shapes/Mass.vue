@@ -1,7 +1,7 @@
 <template>
   <Shape v-bind="props" :origin-y="1">
     <slot />
-    <text :x="50" :y="70" fill="white" text-anchor="middle">
+    <text :x="50" :y="70" fill="black" text-anchor="middle">
       {{ props.mass }}kg
     </text>
   </Shape>
