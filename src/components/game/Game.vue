@@ -34,11 +34,20 @@ import { radToDeg } from '@/utils/angle';
 
 const {
   state: {
-    settings: { sceneWidth, sceneHeight, leverLength, speedMult, maxAngle },
+    settings: {
+      sceneWidth,
+      sceneHeight,
+      leverLength,
+      speedMult,
+      maxAngle,
+      momentAcceleration,
+      gravityAcceleration,
+    },
   },
 } = useStore();
 
-const { swingAngle, addMassToSwing, rotateSwing } = useSwing();
+const { swingAngle, addMassToSwing, rotateSwing } =
+  useSwing(momentAcceleration);
 
 const masses = ref<GameMass[]>([]);
 
@@ -74,7 +83,11 @@ const { startMoveLeft, startMoveRight, stopMove } = useClenchedMove(
 const dropMass = () => {
   if (clenchedMass.value === undefined) return;
   clenchedMass.value.x = { ...clenchedMass.value.x, v: 0, a: 0 };
-  clenchedMass.value.y = { ...clenchedMass.value.y, v: 0, a: 1000 };
+  clenchedMass.value.y = {
+    ...clenchedMass.value.y,
+    v: 0,
+    a: gravityAcceleration,
+  };
   clenchedMass.value.status = 'falling';
 };
 

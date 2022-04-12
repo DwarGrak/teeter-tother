@@ -6,6 +6,8 @@ export interface SettingsState {
   leverWidth: number;
   speedMult: number;
   maxAngle: number;
+  gravityAcceleration: number;
+  momentAcceleration: number;
 }
 
 export const settings = {
@@ -18,5 +20,7 @@ export const settings = {
     leverWidth: 10,
     speedMult: 300,
     maxAngle: 30,
+    gravityAcceleration: 1000,
+    momentAcceleration: 5e-5,
   }),
 };
