@@ -10,7 +10,7 @@
       <Triangle fill="brown" />
     </SVGWrapper>
     <text :x="50" :y="220" fill="white" text-anchor="middle">
-      Score: {{ score }}
+      Score: {{ (score/1000).toFixed(1) }}s
     </text>
   </Shape>
 

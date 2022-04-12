@@ -13,7 +13,9 @@ const props = defineProps({
 
 const text = computed((): string | null => {
   if (props.score)
-    return `Your score ${props.score}! Press space to restart...`;
+    return `Your score ${(props.score / 1000).toFixed(
+      1
+    )}s! Press space to restart...`;
   if (!props.started) return 'Press space to start...';
   if (props.paused) return 'Press space to continue...';
   return null;
