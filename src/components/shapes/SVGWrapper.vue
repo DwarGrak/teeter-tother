@@ -1,6 +1,6 @@
 <template>
   <svg
-    :viewBox="skipViewbox ? '' : '0 0 100 100'"
+    :viewBox="skipViewbox ? undefined : '0 0 100 100'"
     preserveAspectRatio="none"
     v-bind="$props"
     :fill="color"

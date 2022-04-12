@@ -71,7 +71,7 @@ const positionedMasses = computed<PositionedMass[]>(() =>
 const minX = (sceneWidth - leverLength) / 2;
 const centerX = sceneWidth / 2;
 
-const clenchedMass = computed<GameMass>(() =>
+const clenchedMass = computed<GameMass | undefined>(() =>
   masses.value.find(({ status }) => status === 'clenched')
 );
 

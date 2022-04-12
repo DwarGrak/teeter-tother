@@ -1,9 +1,9 @@
-import { Ref } from 'vue';
+import { ComputedRef } from 'vue';
 import MovableMass from '@/interfaces/MovableMass';
 import { stopMass } from '@/services/MovableService';
 
 export default function useClenchedMove(
-  massRef: Ref<MovableMass>,
+  massRef: ComputedRef<MovableMass | undefined>,
   speedMult: number
 ) {
   const startMove = (direction: number) => {

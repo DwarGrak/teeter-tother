@@ -19,5 +19,5 @@ export const calcMoment = (mass: number, dist: number) => mass * dist;
 
 export const getRandomInt = (max: number) => Math.floor(Math.random() * max);
 
-export const getRandomItem = (array: any[]) =>
+export const getRandomItem = <T>(array: T[]): T =>
   array[getRandomInt(array.length)];
