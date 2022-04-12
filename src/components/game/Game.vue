@@ -111,7 +111,7 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
     } else if (mass.status === 'falling') {
       moveMass(mass, delay, undefined, { min: 0, max: sceneHeight });
       const dist = posToSwing(mass, swingAngle.value);
-      if (dist !== undefined) {
+      if (dist !== undefined && dist > -leverLength / 2) {
         mass.x = { pos: dist, v: 0, a: 0 };
         mass.y = { pos: 0, v: 0, a: 0 };
         mass.status = 'on-swing';
