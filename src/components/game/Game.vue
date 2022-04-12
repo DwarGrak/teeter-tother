@@ -27,6 +27,7 @@ import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
 import { calcDisplacement, getRandomInt, getRandomItem } from '@/utils/calc';
 import { svgMap } from '../svg';
+import MovableMass from '@/interfaces/MovableMass';
 
 const {
   state: {
@@ -82,7 +83,10 @@ const isPaused = ref(true);
 const addMoment = (moment: number) => {
   swingMoment.value -= moment / 5000;
 };
-addMoment(100 * 10);
+const addMassToSwing = (mass: MovableMass) => {
+  const moment = mass.x.pos * mass.mass;
+  addMoment(moment);
+};
 
 const { start: startDraw } = useDraw((delay: number) => {
   if (isPaused.value) return false;
@@ -108,7 +112,7 @@ const { start: startDraw } = useDraw((delay: number) => {
         mass.x = { pos: dist, v: 0, a: 0 };
         mass.y = { pos: 0, v: 0, a: 0 };
         mass.status = 'on-swing';
-        addMoment(dist * mass.mass);
+        addMassToSwing(mass);
       }
     }
   }
@@ -139,7 +143,10 @@ const createRandomMass = (status: GameMassStatus) => {
 };
 
 const startGame = () => {
-  masses.value = [createRandomMass('on-swing'), createRandomMass('clenched')];
+  const swingedMass = createRandomMass('on-swing');
+  const clenchedMass = createRandomMass('clenched');
+  masses.value = [swingedMass, clenchedMass];
+  addMassToSwing(swingedMass);
   isStarted.value = true;
   isPaused.value = false;
 };
