@@ -2,16 +2,17 @@
   <GlobalEvents
     @keydown.left="startMoveLeft"
     @keydown.right="startMoveRight"
-    @keydown.enter="dropMass"
+    @keydown.down="dropMass"
     @keydown.space="switchState"
     @keyup="stopMove"
   />
-  <Scene
-    :swingRotation="swingAngle"
-    :masses="positionedMasses"
-    :started="isStarted"
-    :paused="isPaused"
-  />
+  <Scene :swingRotation="swingAngle" :masses="positionedMasses" :score="score">
+    <UI
+      :started="isStarted"
+      :paused="isPaused"
+      :score="isStarted ? 0 : score"
+    />
+  </Scene>
 </template>
 
 <script setup lang="ts">
@@ -20,6 +21,7 @@ import { useStore } from 'vuex';
 import { GlobalEvents } from 'vue-global-events';
 import GameMass, { GameMassStatus } from '@/interfaces/GameMass';
 import Scene from '../Scene.vue';
+import UI from '../UI.vue';
 import useClenchedMove from './useClenchedMove';
 import useDraw from './useDraw';
 import useSwing from './useSwing';
@@ -28,10 +30,11 @@ import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
 import { getRandomInt, getRandomItem } from '@/utils/calc';
 import { svgMap } from '../svg';
+import { radToDeg } from '@/utils/angle';
 
 const {
   state: {
-    settings: { sceneWidth, sceneHeight, leverLength, speedMult },
+    settings: { sceneWidth, sceneHeight, leverLength, speedMult, maxAngle },
   },
 } = useStore();
 
@@ -77,10 +80,13 @@ const dropMass = () => {
 
 const isStarted = ref(false);
 const isPaused = ref(true);
+const timer = ref(0);
+const score = ref(0);
 
 const { start: startDraw } = useDraw((delay: number) => {
   if (isPaused.value) return false;
 
+  score.value = Date.now() - timer.value;
   rotateSwing(delay);
 
   for (let mass of masses.value) {
@@ -96,6 +102,11 @@ const { start: startDraw } = useDraw((delay: number) => {
         addMassToSwing(mass);
       }
     }
+  }
+
+  if (Math.abs(radToDeg(swingAngle.value)) > maxAngle) {
+    finishGame();
+    return false;
   }
   return true;
 });
@@ -123,11 +134,17 @@ const createRandomMass = (status: GameMassStatus) => {
   };
 };
 
+const finishGame = () => {
+  isStarted.value = false;
+  isPaused.value = true;
+};
+
 const startGame = () => {
   const swingedMass = createRandomMass('on-swing');
   const clenchedMass = createRandomMass('clenched');
   masses.value = [swingedMass, clenchedMass];
   addMassToSwing(swingedMass);
+  timer.value = Date.now();
   isStarted.value = true;
   isPaused.value = false;
 };

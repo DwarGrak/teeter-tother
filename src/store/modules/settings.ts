@@ -5,6 +5,7 @@ export interface SettingsState {
   leverLength: number;
   leverWidth: number;
   speedMult: number;
+  maxAngle: number;
 }
 
 export const settings = {
@@ -16,5 +17,6 @@ export const settings = {
     leverLength: 1000,
     leverWidth: 10,
     speedMult: 300,
+    maxAngle: 30,
   }),
 };

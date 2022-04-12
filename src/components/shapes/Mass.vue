@@ -1,7 +1,9 @@
 <template>
-  <Shape v-bind="props" :origin-y="1">
-    <slot />
-    <text :x="50" :y="70" fill="black" text-anchor="middle">
+  <Shape v-bind="props" :origin-y="1" skip-viewbox>
+    <SVGWrapper :height="height" :width="width" :color="color">
+      <slot />
+    </SVGWrapper>
+    <text :x="width / 2" :y="height * 0.6" fill="black" text-anchor="middle">
       {{ props.mass }}kg
     </text>
   </Shape>
@@ -10,6 +12,7 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 import Shape from './Shape.vue';
+import SVGWrapper from './SVGWrapper.vue';
 
 const props = defineProps({
   ...Shape.props,

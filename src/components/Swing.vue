@@ -4,9 +4,14 @@
     :x="sceneWidth / 2"
     :y="sceneHeight"
     :origin-y="OriginY.bottom"
-    color="brown"
+    skip-viewbox
   >
-    <Triangle />
+    <SVGWrapper :height="standHeight">
+      <Triangle fill="brown" />
+    </SVGWrapper>
+    <text :x="50" :y="220" fill="white" text-anchor="middle">
+      Score: {{ score }}
+    </text>
   </Shape>
 
   <Shape
@@ -29,9 +34,11 @@ import Shape from './shapes/Shape.vue';
 import Square from './svg/Square.vue';
 import Triangle from './svg/Triangle.vue';
 import { OriginY } from '../utils/origin';
+import SVGWrapper from './shapes/SVGWrapper.vue';
 
 const props = defineProps({
   rotation: { type: Number, default: 0 },
+  score: { type: Number, default: 0 },
 });
 
 const {

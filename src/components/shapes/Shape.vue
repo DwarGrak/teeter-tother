@@ -1,5 +1,11 @@
 <template>
-  <SWGWrapper :style="style" :height="height" :width="width" :color="color">
+  <SWGWrapper
+    :style="style"
+    :height="height"
+    :width="width"
+    :color="color"
+    :skip-viewbox="skipViewbox"
+  >
     <slot />
   </SWGWrapper>
 </template>
@@ -22,6 +28,7 @@ const props = defineProps({
   x: { type: Number, default: null },
   y: { type: Number, default: null },
   rotation: { type: Number, default: 0 },
+  skipViewbox: { type: Boolean, default: false },
 });
 
 const top = computed(() => {
