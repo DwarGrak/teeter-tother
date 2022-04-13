@@ -27,6 +27,7 @@ import useDraw from './useDraw';
 import useSwing from './useSwing';
 import useScore from './useScore';
 import useDrop from './useDrop';
+import useGameState from './useGameState';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
@@ -34,6 +35,7 @@ import { getRandomInt, getRandomItem } from '@/utils/calc';
 import { svgMap, svgName } from '../svg';
 import { radToDeg } from '@/utils/angle';
 
+// store
 const {
   state: {
     settings: {
@@ -50,14 +52,15 @@ const {
   },
 } = useStore();
 
-const { swingAngle, initSwing, addMassToSwing, rotateSwing } =
-  useSwing(momentAcceleration);
-const { score, clearScore, updateScore } = useScore();
+const minX = (sceneWidth - leverLength) / 2;
+const centerX = sceneWidth / 2;
 
+//vars & comps
 const masses = ref<GameMass[]>([]);
 
-const isStarted = ref(false);
-const isPaused = ref(true);
+const clenchedMass = computed<GameMass | undefined>(() =>
+  masses.value.find(({ status }) => status === 'clenched')
+);
 
 const positionedMasses = computed<PositionedMass[]>(() =>
   masses.value.map(({ status, ...mass }) => {
@@ -76,18 +79,17 @@ const positionedMasses = computed<PositionedMass[]>(() =>
   })
 );
 
-const minX = (sceneWidth - leverLength) / 2;
-const centerX = sceneWidth / 2;
-
-const clenchedMass = computed<GameMass | undefined>(() =>
-  masses.value.find(({ status }) => status === 'clenched')
-);
-
+// uses
+const { swingAngle, initSwing, addMassToSwing, rotateSwing } =
+  useSwing(momentAcceleration);
+const { score, clearScore, updateScore } = useScore();
 const { startMoveLeft, startMoveRight, stopMove } = useClenchedMove(
   clenchedMass,
   speedMult
 );
+const { isStarted, isPaused, setStartState, setFinishState } = useGameState();
 
+// check end game
 const checkMaxAngle = (): boolean =>
   Math.abs(radToDeg(swingAngle.value)) > maxAngle;
 
@@ -104,6 +106,30 @@ const checkMaxMass = (): boolean => {
   return leftMass >= gameOverMass || rightMass >= gameOverMass;
 };
 
+const checkGameEnd = (massAddedToSwing: boolean): boolean => {
+  return checkMaxAngle() || (massAddedToSwing && checkMaxMass());
+};
+
+// draw
+const moveClenchedMass = (mass: GameMass, delay: number) =>
+  moveMass(mass, delay, {
+    min: minX,
+    max: minX + leverLength,
+  });
+
+const moveFallingMass = (mass: GameMass, delay: number): boolean => {
+  moveMass(mass, delay, undefined, { min: 0, max: sceneHeight });
+  const dist = posToSwing(mass, swingAngle.value);
+  if (dist !== undefined && dist > -leverLength / 2) {
+    mass.x = { pos: dist, v: 0, a: 0 };
+    mass.y = { pos: 0, v: 0, a: 0 };
+    mass.status = 'on-swing';
+    addMassToSwing(mass);
+    return true;
+  }
+  return false;
+};
+
 const { start: startDraw } = useDraw((now: number, delay: number) => {
   if (isPaused.value) return false;
 
@@ -113,24 +139,13 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
   let massAddedToSwing = false;
   for (let mass of masses.value) {
     if (mass.status === 'clenched') {
-      moveMass(clenchedMass.value, delay, {
-        min: minX,
-        max: minX + leverLength,
-      });
+      moveClenchedMass(mass, delay);
     } else if (mass.status === 'falling') {
-      moveMass(mass, delay, undefined, { min: 0, max: sceneHeight });
-      const dist = posToSwing(mass, swingAngle.value);
-      if (dist !== undefined && dist > -leverLength / 2) {
-        mass.x = { pos: dist, v: 0, a: 0 };
-        mass.y = { pos: 0, v: 0, a: 0 };
-        mass.status = 'on-swing';
-        addMassToSwing(mass);
-        massAddedToSwing = true;
-      }
+      massAddedToSwing = massAddedToSwing || moveFallingMass(mass, delay);
     }
   }
 
-  if (checkMaxAngle() || (massAddedToSwing && checkMaxMass())) {
+  if (checkGameEnd(massAddedToSwing)) {
     finishGame();
     return false;
   }
@@ -140,6 +155,7 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
   return true;
 });
 
+// add mass
 const createRandomMass = (status: GameMassStatus): GameMass => {
   const colors = ['red', 'green', 'yellow', 'orange'];
   const color = getRandomItem(colors);
@@ -167,6 +183,14 @@ const addNewClenchedMass = () => {
   masses.value.push(createRandomMass('clenched'));
 };
 
+const addStartMasses = () => {
+  const swingedMass = createRandomMass('on-swing');
+  const clenchedMass = createRandomMass('clenched');
+  masses.value = [swingedMass, clenchedMass];
+  addMassToSwing(swingedMass);
+};
+
+// drop mass
 const { dropMass, checkDropTimer, clearDropTimer } = useDrop(
   clenchedMass,
   addNewClenchedMass,
@@ -174,27 +198,22 @@ const { dropMass, checkDropTimer, clearDropTimer } = useDrop(
   dropDelay
 );
 
-const finishGame = () => {
-  isStarted.value = false;
-  isPaused.value = true;
-  clearDropTimer();
+// pause/start/end game
+const switchState = () => {
+  if (!isStarted.value) startGame();
+  else isPaused.value = !isPaused.value;
+  if (!isPaused.value) startDraw();
 };
 
 const startGame = () => {
   clearScore();
   initSwing();
-  isStarted.value = true;
-  isPaused.value = false;
-
-  const swingedMass = createRandomMass('on-swing');
-  const clenchedMass = createRandomMass('clenched');
-  masses.value = [swingedMass, clenchedMass];
-  addMassToSwing(swingedMass);
+  setStartState();
+  addStartMasses();
 };
 
-const switchState = () => {
-  if (!isStarted.value) startGame();
-  else isPaused.value = !isPaused.value;
-  if (!isPaused.value) startDraw();
+const finishGame = () => {
+  setFinishState();
+  clearDropTimer();
 };
 </script>
