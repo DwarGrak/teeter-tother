@@ -149,7 +149,9 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
 
   if (dropTimer.value && dropTimer.value < now) {
     dropTimer.value = 0;
-    addNewClenchedMass();
+    if (!clenchedMass.value) {
+      addNewClenchedMass();
+    }
   }
 
   return true;
