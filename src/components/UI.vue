@@ -1,5 +1,16 @@
 <template>
-  <div v-if="text" class="banner">{{ text }}</div>
+  <div v-if="text" class="banner">
+    <p>
+      The goal of the game is to balance swing as long as you can. Game ends
+      when the lever touches the floor or if you load more than 20 kg weights on
+      either side of the lever.
+    </p>
+    <p>
+      Move a clenched mass by "left" and "right" arrows, drop it by "down"
+      arrow. You can pause the game by "space" key.
+    </p>
+    <p class="banner__title">{{ text }}</p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -30,8 +41,11 @@ const text = computed((): string | null => {
   bottom: 0;
   right: 0;
   text-align: center;
-  font-size: 48px;
-  padding-top: 200px;
+  font-size: 24px;
+  padding: 200px 100px;
   backdrop-filter: blur(5px) saturate(20%);
+  &__title {
+    font-size: 48px;
+  }
 }
 </style>
