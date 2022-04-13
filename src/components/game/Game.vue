@@ -159,7 +159,7 @@ const createRandomMass = (status: GameMassStatus): GameMass => {
   const colors = ['red', 'green', 'yellow', 'orange'];
   const color = getRandomItem(colors);
   const mass = 1 + getRandomInt(10);
-  const size = 60 + getRandomInt(40);
+  const size = 60 + mass * 4;
   const type = getRandomItem(Object.keys(svgMap)) as svgName;
   const x =
     status === 'clenched'
