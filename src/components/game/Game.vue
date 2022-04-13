@@ -26,6 +26,7 @@ import useClenchedMove from './useClenchedMove';
 import useDraw from './useDraw';
 import useSwing from './useSwing';
 import useScore from './useScore';
+import useDrop from './useDrop';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
@@ -51,14 +52,12 @@ const {
 
 const { swingAngle, initSwing, addMassToSwing, rotateSwing } =
   useSwing(momentAcceleration);
-
 const { score, clearScore, updateScore } = useScore();
 
 const masses = ref<GameMass[]>([]);
 
 const isStarted = ref(false);
 const isPaused = ref(true);
-const dropTimer = ref(0);
 
 const positionedMasses = computed<PositionedMass[]>(() =>
   masses.value.map(({ status, ...mass }) => {
@@ -88,18 +87,6 @@ const { startMoveLeft, startMoveRight, stopMove } = useClenchedMove(
   clenchedMass,
   speedMult
 );
-
-const dropMass = () => {
-  if (clenchedMass.value === undefined) return;
-  clenchedMass.value.x = { ...clenchedMass.value.x, v: 0, a: 0 };
-  clenchedMass.value.y = {
-    ...clenchedMass.value.y,
-    v: 0,
-    a: gravityAcceleration,
-  };
-  clenchedMass.value.status = 'falling';
-  dropTimer.value = Date.now() + dropDelay;
-};
 
 const checkMaxAngle = (): boolean =>
   Math.abs(radToDeg(swingAngle.value)) > maxAngle;
@@ -148,12 +135,7 @@ const { start: startDraw } = useDraw((now: number, delay: number) => {
     return false;
   }
 
-  if (dropTimer.value && dropTimer.value < now) {
-    dropTimer.value = 0;
-    if (!clenchedMass.value) {
-      addNewClenchedMass();
-    }
-  }
+  checkDropTimer(now);
 
   return true;
 });
@@ -185,10 +167,17 @@ const addNewClenchedMass = () => {
   masses.value.push(createRandomMass('clenched'));
 };
 
+const { dropMass, checkDropTimer, clearDropTimer } = useDrop(
+  clenchedMass,
+  addNewClenchedMass,
+  gravityAcceleration,
+  dropDelay
+);
+
 const finishGame = () => {
   isStarted.value = false;
   isPaused.value = true;
-  dropTimer.value = 0;
+  clearDropTimer();
 };
 
 const startGame = () => {
