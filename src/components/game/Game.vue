@@ -25,6 +25,7 @@ import UI from '../UI.vue';
 import useClenchedMove from './useClenchedMove';
 import useDraw from './useDraw';
 import useSwing from './useSwing';
+import useScore from './useScore';
 import { moveMass } from '@/services/MovableService';
 import { posToSwing, swingToPos } from '@/services/SwingService';
 import PositionedMass from '@/interfaces/PositionedMass';
@@ -51,12 +52,12 @@ const {
 const { swingAngle, initSwing, addMassToSwing, rotateSwing } =
   useSwing(momentAcceleration);
 
+const { score, clearScore, updateScore } = useScore();
+
 const masses = ref<GameMass[]>([]);
 
 const isStarted = ref(false);
 const isPaused = ref(true);
-const timer = ref(0);
-const score = ref(0);
 const dropTimer = ref(0);
 
 const positionedMasses = computed<PositionedMass[]>(() =>
@@ -119,7 +120,7 @@ const checkMaxMass = (): boolean => {
 const { start: startDraw } = useDraw((now: number, delay: number) => {
   if (isPaused.value) return false;
 
-  score.value = Date.now() - timer.value;
+  updateScore();
   rotateSwing(delay);
 
   let massAddedToSwing = false;
@@ -191,7 +192,7 @@ const finishGame = () => {
 };
 
 const startGame = () => {
-  timer.value = Date.now();
+  clearScore();
   initSwing();
   isStarted.value = true;
   isPaused.value = false;
